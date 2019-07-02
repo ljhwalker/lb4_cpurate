@@ -3,37 +3,27 @@
 import sys
 import json
 
-fw = open("./save_cpudata.js", mode='r')
-string = fw.read()
-js = json.loads(string)
-
-core = "core-cycles"
-num0_worker = "numa0-worker"
-num1_worker = "numa1-worker"
-num0_recv = "numa0-receiver"
-num1_recv = "numa1-receiver"
-
-idle_cycles = "idle_cycles"
-work_cycles = "work_cycles"
-work_counts = "work_counts"
-
-def get_num():
-	global js
+def get_num(Js):
 	work0 = [0.0,0.0]
 	work1 = [0.0,0.0]
 	recv0 = [0.0,0.0]
 	recv1 = [0.0,0.0]
+	
+	Core = "core-cycles"
+	Idle_Cycles = "idle_cycles"
+	Work_Cycles = "work_cycles"
+	Work_Counts = "work_counts"
 
-	keys = js[core].keys()
+	keys = Js[Core].keys()
 	for index in range(len(keys)):
 		workstr = ""
 		if keys[index].find("receiver") != -1:
-			workstr = work_counts
+			workstr = Work_Counts
 		else:
-			workstr = work_cycles
+			workstr = Work_Cycles
 	
-		idle = float(js[core][keys[index]][idle_cycles])
-		work = float(js[core][keys[index]][workstr])
+		idle = float(Js[Core][keys[index]][Idle_Cycles])
+		work = float(Js[Core][keys[index]][workstr])
 		
 		if keys[index].find("numa0-work") != -1:
 			work0[0] += idle
@@ -53,5 +43,11 @@ def get_num():
 		,round(recv0[1]/(recv0[0]+recv0[1]), 2) \
 		,round(recv1[1]/(recv1[0]+recv1[1]), 2)
 
-get_num()
+def main():
+	Fw = open("./save_cpudata.js", mode='r')
+	String = Fw.read()
+	Js = json.loads(String)
+	get_num(Js)
 
+if __name__ == "__main__":
+	sys.exit(main())
